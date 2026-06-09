@@ -2,827 +2,660 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="mobile-web-app-capable" content="yes"/>
-<meta name="theme-color" content="#c0392b"/>
-<title>🥩 Butchery Reworks Tracker</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#b71c1c"/>
+<title>Butchery Reworks</title>
 <style>
-  :root {
-    --red:#c0392b; --red-dim:rgba(192,57,43,0.13); --red-glow:rgba(192,57,43,0.28);
-    --bg:#141414; --surf:#1c1c1c; --card:#212121; --bdr:#2a2a2a; --bdr-hi:#3a3a3a;
-    --muted:#666; --dim:#999; --text:#e8e8e8; --white:#fff;
-    --green:#27ae60; --green-dim:rgba(39,174,96,0.13);
-    --amber:#e67e22; --blue:#2980b9; --blue-dim:rgba(41,128,185,0.13);
-  }
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100vh;padding-bottom:70px}
-  button{font-family:inherit;cursor:pointer;transition:opacity .15s}
-  button:active{opacity:.7}
-  input{font-family:inherit}
-  input:focus{outline:2px solid var(--red);outline-offset:1px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#f5f5f5;font-family:Arial,sans-serif;min-height:100vh;color:#222}
+button{font-family:Arial,sans-serif;cursor:pointer;border:none;transition:opacity .15s}
+button:active{opacity:.75}
+input,select{font-family:Arial,sans-serif}
 
-  /* HEADER */
-  #header{background:#0d0d0d;border-bottom:3px solid var(--red);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10;position:sticky;top:0;z-index:50}
-  #logo{font-size:18px;font-weight:900;color:var(--red);letter-spacing:3px;text-transform:uppercase}
-  #sub{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px}
-  #date-input{background:#111;border:1px solid var(--bdr);color:var(--text);padding:7px 11px;border-radius:4px;font-size:13px;font-family:monospace}
+/* TOP BAR */
+#topbar{background:#b71c1c;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+#topbar h1{font-size:18px;font-weight:700;letter-spacing:1px}
+#topbar .date-wrap{display:flex;align-items:center;gap:6px;font-size:12px}
+#dateInp{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:5px 10px;border-radius:20px;font-size:12px;width:130px}
+#dateInp::-webkit-calendar-picker-indicator{filter:invert(1)}
 
-  /* TABS */
-  #tabs{display:flex;border-bottom:2px solid var(--bdr);overflow-x:auto;background:#0d0d0d;scrollbar-width:none}
-  #tabs::-webkit-scrollbar{display:none}
-  .tab-btn{padding:11px 18px;background:transparent;border:none;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;font-family:monospace;font-weight:700;transition:color .2s}
-  .tab-btn.active{color:var(--text);border-bottom:2px solid var(--red)}
+/* BOTTOM NAV */
+#botnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid #e0e0e0;display:flex;z-index:100}
+.nav-btn{flex:1;padding:10px 4px 8px;background:transparent;border:none;font-size:10px;color:#999;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.nav-btn .ico{font-size:22px}
+.nav-btn.active{color:#b71c1c}
+.nav-btn.active .ico{transform:scale(1.1)}
 
-  /* MAIN */
-  #main{max-width:1040px;margin:0 auto;padding:20px 14px}
+/* PAGES */
+.page{display:none;padding:16px 16px 90px}
+.page.active{display:block}
 
-  /* STAT CARDS */
-  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
-  .stat-card{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:14px 16px}
-  .stat-val{font-size:22px;font-weight:900;margin-bottom:2px;font-family:monospace}
-  .stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:2px}
+/* CARDS */
+.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+.card-title{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
 
-  /* SECTION TITLE */
-  .sec{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;border-bottom:1px solid var(--bdr);padding-bottom:7px;margin-top:4px}
+/* SETUP PAGE */
+.setup-step{display:flex;gap:12px;margin-bottom:16px;align-items:flex-start}
+.step-circle{background:#b71c1c;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;margin-top:2px}
+.step-text{font-size:14px;color:#444;line-height:1.6}
+.step-text strong{color:#222}
+.step-text a{color:#b71c1c;font-weight:700}
+#keyInp{width:100%;border:2px solid #e0e0e0;border-radius:8px;padding:12px;font-size:13px;font-family:'Courier New',monospace;margin:8px 0;background:#fafafa}
+#keyInp:focus{outline:none;border-color:#b71c1c}
+#keyInp::placeholder{color:#bbb}
+.btn-red{background:#b71c1c;color:#fff;padding:14px;border-radius:10px;font-size:15px;font-weight:700;width:100%;letter-spacing:1px}
+.btn-green{background:#2e7d32;color:#fff;padding:14px;border-radius:10px;font-size:15px;font-weight:700;width:100%;letter-spacing:1px}
+.btn-blue{background:#1565c0;color:#fff;padding:14px;border-radius:10px;font-size:14px;font-weight:700;width:100%;letter-spacing:1px}
+.btn-grey{background:#eeeeee;color:#444;padding:12px;border-radius:8px;font-size:13px;font-weight:700;width:100%}
+.key-saved{background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:10px 14px;font-size:13px;color:#2e7d32;margin-bottom:10px;display:none}
 
-  /* BUTTONS */
-  .btn{border:none;border-radius:5px;font-family:monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;font-size:11px;padding:10px 20px;cursor:pointer}
-  .btn-red{background:var(--red);color:#fff}
-  .btn-ghost{background:transparent;border:1px solid var(--bdr-hi);color:var(--dim)}
-  .btn-green{background:var(--green);color:#fff}
-  .btn-blue{background:var(--blue);color:#fff}
-  .btn:disabled{opacity:.4;cursor:not-allowed}
-  .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+/* SCAN PAGE */
+#dropZone{border:3px dashed #ccc;border-radius:16px;padding:36px 16px;text-align:center;cursor:pointer;background:#fafafa;margin-bottom:14px;transition:all .2s}
+#dropZone.drag{border-color:#b71c1c;background:#fff5f5}
+#dropZone .big-icon{font-size:52px;margin-bottom:10px}
+#dropZone .big-txt{font-size:17px;font-weight:700;color:#444;margin-bottom:4px}
+#dropZone .small-txt{font-size:12px;color:#aaa}
+#prevRow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.prev-wrap{position:relative;width:76px;height:76px}
+.prev-img{width:76px;height:76px;object-fit:cover;border-radius:8px;border:2px solid #e0e0e0}
+.prev-x{position:absolute;top:-6px;right:-6px;background:#b71c1c;color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#scanMsg{border-radius:10px;padding:12px 14px;font-size:13px;margin-bottom:12px;display:none;line-height:1.5}
+#scanMsg.info{background:#e3f2fd;color:#1565c0;border:1px solid #90caf9}
+#scanMsg.ok{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+#scanMsg.err{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a}
+#scanBtn{width:100%;padding:16px;border-radius:12px;background:#b71c1c;color:#fff;font-size:16px;font-weight:700;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px}
+#scanBtn:disabled{opacity:.4;cursor:not-allowed}
 
-  /* UPLOAD ZONE */
-  #drop-zone{border:2px dashed var(--bdr-hi);border-radius:10px;padding:36px 20px;text-align:center;cursor:pointer;margin-bottom:18px;transition:all .2s;background:transparent}
-  #drop-zone.drag{border-color:var(--red);background:var(--red-dim)}
-  #drop-zone .icon{font-size:38px;margin-bottom:10px}
-  #drop-zone .txt{font-size:14px;color:#ccc;margin-bottom:5px}
-  #drop-zone .hint{font-size:11px;color:var(--muted)}
+/* MANUAL FORM */
+.mform{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.mform .full{grid-column:1/-1}
+.finp label{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px}
+.finp input{width:100%;border:1px solid #e0e0e0;border-radius:8px;padding:11px 12px;font-size:14px;background:#fafafa}
+.finp input:focus{outline:none;border-color:#b71c1c;background:#fff}
 
-  /* PREVIEW */
-  #preview{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
-  .prev-wrap{position:relative}
-  .prev-img{width:84px;height:84px;object-fit:cover;border-radius:6px;border:2px solid var(--bdr)}
-  .prev-del{position:absolute;top:-7px;right:-7px;background:var(--red);color:#fff;border:none;border-radius:50%;width:21px;height:21px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+/* TODAY PAGE */
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-box{background:#fff;border-radius:12px;padding:14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.stat-val{font-size:24px;font-weight:700;margin-bottom:2px}
+.stat-lbl{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:1px}
 
-  /* ALERT BOXES */
-  .alert-err{background:var(--red-dim);border:1px solid var(--red);border-radius:6px;padding:11px 14px;color:#e88;font-size:12px;margin-bottom:14px}
-  .alert-info{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:11px 14px;color:var(--dim);font-size:12px;margin-bottom:14px}
-  .alert-ok{background:var(--green-dim);border:1px solid var(--green);border-radius:6px;padding:11px 14px;color:#6f9;font-size:12px;margin-bottom:14px}
+.prod-item{background:#fff;border-radius:10px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.prod-left .prod-name{font-size:14px;font-weight:700;color:#222;margin-bottom:2px}
+.prod-left .prod-sub{font-size:11px;color:#999}
+.prod-right{text-align:right}
+.prod-kg{font-size:16px;font-weight:700;color:#e65100}
+.prod-val{font-size:12px;color:#b71c1c;margin-top:1px}
+.prod-top{border-left:4px solid #b71c1c}
 
-  /* MANUAL FORM */
-  .form-grid{display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr;gap:9px;margin-bottom:10px}
-  @media(max-width:600px){.form-grid{grid-template-columns:1fr 1fr}}
-  .form-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
-  .form-inp{background:#111;border:1px solid var(--bdr);color:var(--text);padding:9px 10px;border-radius:4px;font-size:13px;font-family:monospace;width:100%}
+.empty{text-align:center;padding:48px 20px;color:#bbb}
+.empty .eico{font-size:52px;margin-bottom:12px}
+.empty p{font-size:14px;line-height:1.6}
 
-  /* TABLE */
-  .tbl-wrap{overflow-x:auto;margin-bottom:8px}
-  table{width:100%;border-collapse:collapse;font-size:12px}
-  th{background:#111;color:var(--muted);text-align:left;padding:8px 10px;font-size:9px;letter-spacing:2px;text-transform:uppercase;border-bottom:2px solid var(--bdr);white-space:nowrap}
-  td{padding:8px 10px;border-bottom:1px solid var(--bdr);vertical-align:middle}
-  tr:nth-child(even) td{background:rgba(255,255,255,.015)}
-  .tfoot td{border-top:2px solid var(--red);font-weight:900;font-family:monospace}
-  .pill{background:var(--red-dim);color:var(--red);border-radius:3px;padding:2px 7px;font-size:10px;font-weight:700;letter-spacing:.5px;font-family:monospace}
-  .c-red{color:var(--red);font-weight:700;font-family:monospace}
-  .c-amb{color:var(--amber);font-weight:700;font-family:monospace}
-  .c-dim{color:var(--dim);font-family:monospace}
-  .del-btn{background:transparent;border:1px solid #3a3a3a;color:var(--muted);border-radius:3px;width:22px;height:22px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+/* REPORTS PAGE */
+.period-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.prbtn{padding:9px 18px;border-radius:20px;border:2px solid #e0e0e0;background:#fff;color:#999;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.prbtn.active{border-color:#b71c1c;background:#b71c1c;color:#fff}
+.rep-range{font-size:12px;color:#999;margin-bottom:14px;padding:8px 12px;background:#fff;border-radius:8px}
+.rep-totals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.rep-tot-box{background:#fff;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.rep-tot-val{font-size:18px;font-weight:700}
+.rep-tot-lbl{font-size:9px;color:#999;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
 
-  /* PERIOD PILLS */
-  .period-row{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap}
-  .period-btn{padding:7px 16px;border-radius:5px;border:1px solid var(--bdr);background:transparent;color:var(--dim);font-family:monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;cursor:pointer;transition:all .15s}
-  .period-btn.active{border-color:var(--red);background:var(--red-dim);color:var(--red)}
+/* HISTORY */
+.hist-item{background:#fff;border-radius:10px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.08);cursor:pointer}
+.hist-item:active{opacity:.8}
+.hist-d{font-size:14px;font-weight:700;color:#222;margin-bottom:2px}
+.hist-m{font-size:11px;color:#999}
+.hist-v{font-size:15px;font-weight:700;color:#b71c1c}
 
-  /* HISTORY ITEMS */
-  .hist-item{background:var(--card);border:1px solid var(--bdr);border-radius:7px;padding:13px 16px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .2s}
-  .hist-item:hover,.hist-item.today{border-color:var(--red)}
-  .hist-date{font-size:13px;font-weight:700;margin-bottom:3px}
-  .hist-meta{font-size:11px;color:var(--muted)}
+/* SPINNER */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin .8s linear infinite}
 
-  /* API KEY input */
-  #api-section{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:16px;margin-bottom:20px}
-  #api-section summary{cursor:pointer;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);list-style:none}
-  #api-section summary::-webkit-details-marker{display:none}
-  #api-key-inp{background:#111;border:1px solid var(--bdr);color:var(--text);padding:8px 11px;border-radius:4px;font-size:12px;font-family:monospace;width:100%;margin-top:10px}
-  .key-note{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5}
+/* DIVIDER */
+.or{display:flex;align-items:center;gap:10px;margin:14px 0;color:#ccc;font-size:12px}
+.or::before,.or::after{content:'';flex:1;border-top:1px solid #e0e0e0}
 </style>
 </head>
 <body>
 
-<div id="header">
-  <div>
-    <div id="logo">🥩 Reworks Tracker</div>
-    <div id="sub">Butchery Daily Tracking System</div>
-  </div>
-  <div style="display:flex;align-items:center;gap:8px">
-    <span style="font-size:10px;color:var(--muted)">Date:</span>
-    <input type="date" id="date-input"/>
+<!-- TOP BAR -->
+<div id="topbar">
+  <h1>🥩 Reworks Tracker</h1>
+  <div class="date-wrap">
+    <span>📅</span>
+    <input type="date" id="dateInp"/>
   </div>
 </div>
 
-<div id="tabs">
-  <button class="tab-btn active" onclick="switchTab('capture')" id="t-capture">📷 Capture</button>
-  <button class="tab-btn" onclick="switchTab('today')" id="t-today">📋 Today</button>
-  <button class="tab-btn" onclick="switchTab('report')" id="t-report">📊 Report</button>
-  <button class="tab-btn" onclick="switchTab('history')" id="t-history">📅 History</button>
+<!-- PAGES -->
+
+<!-- ① SETUP -->
+<div class="page active" id="pg-setup">
+  <div class="card">
+    <div class="card-title">⚙️ One-time Setup</div>
+    <div class="key-saved" id="keySaved">✅ API Key saved — you are ready to scan!</div>
+
+    <div class="setup-step">
+      <div class="step-circle">1</div>
+      <div class="step-text">Go to <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> and sign in with your Gmail account</div>
+    </div>
+    <div class="setup-step">
+      <div class="step-circle">2</div>
+      <div class="step-text">Tap <strong>API Keys</strong> → <strong>Create Key</strong> → name it <strong>butchery</strong> → tap <strong>Add</strong></div>
+    </div>
+    <div class="setup-step">
+      <div class="step-circle">3</div>
+      <div class="step-text">Press and hold the key → tap <strong>Copy</strong></div>
+    </div>
+    <div class="setup-step">
+      <div class="step-circle">4</div>
+      <div class="step-text">Paste it below and tap <strong>Save Key</strong></div>
+    </div>
+
+    <input type="password" id="keyInp" placeholder="Paste your key here (sk-ant-api03-...)"/>
+    <button class="btn-red" onclick="saveKey()">💾 Save Key</button>
+    <br/><br/>
+    <a href="https://console.anthropic.com/settings/keys" target="_blank" style="text-decoration:none">
+      <button class="btn-blue">🔗 Open Anthropic Console</button>
+    </a>
+  </div>
 </div>
 
-<div id="main">
-  <!-- CAPTURE TAB -->
-  <div id="tab-capture">
-    <details id="api-section">
-      <summary>⚙ Anthropic API Key (required for photo scanning)</summary>
-      <input type="password" id="api-key-inp" placeholder="sk-ant-api03-..." oninput="saveKey()"/>
-      <div class="key-note">
-        Your key is saved only on this device in localStorage.<br>
-        Get a free key at <strong>console.anthropic.com</strong> → API Keys.<br>
-        Without a key, you can still add entries manually below.
-      </div>
-    </details>
+<!-- ② SCAN -->
+<div class="page" id="pg-scan">
 
-    <div id="drop-zone" onclick="document.getElementById('file-inp').click()"
-         ondragover="ev.preventDefault();this.classList.add('drag')"
-         ondragleave="this.classList.remove('drag')"
-         ondrop="handleDrop(event)">
-      <div class="icon">📸</div>
-      <div class="txt">Tap or drag label book photos here</div>
-      <div class="hint">Multiple images supported · JPG PNG HEIC</div>
-    </div>
-    <input type="file" id="file-inp" accept="image/*" multiple style="display:none" onchange="addFiles(this.files)"/>
-
-    <div id="preview"></div>
-    <div id="err-box" style="display:none" class="alert-err"></div>
-    <div id="prog-box" style="display:none" class="alert-info"></div>
-    <div id="ok-box" style="display:none" class="alert-ok"></div>
-
-    <button class="btn btn-red" id="analyse-btn" style="width:100%;font-size:12px;padding:13px" onclick="analyseImages()" disabled>
-      Analyse Images → Add to Day
-    </button>
-
-    <div style="margin-top:28px">
-      <div class="sec">Add Entry Manually</div>
-      <div class="form-grid">
-        <div><div class="form-lbl">Product Name</div><input class="form-inp" id="m-product" placeholder="e.g. Rump Steak" onkeydown="if(event.key==='Enter')addManual()"/></div>
-        <div><div class="form-lbl">Barcode / PLU</div><input class="form-inp" id="m-barcode" placeholder="e.g. 1234" onkeydown="if(event.key==='Enter')addManual()"/></div>
-        <div><div class="form-lbl">Weight (kg)</div><input class="form-inp" id="m-weight" type="number" step="0.001" placeholder="1.450" onkeydown="if(event.key==='Enter')addManual()"/></div>
-        <div><div class="form-lbl">Price / kg (R)</div><input class="form-inp" id="m-price" type="number" step="0.01" placeholder="189.99" onkeydown="if(event.key==='Enter')addManual()"/></div>
-      </div>
-      <button class="btn btn-red" onclick="addManual()">+ Add Entry</button>
-    </div>
+  <!-- Upload zone -->
+  <div id="dropZone" onclick="document.getElementById('fileInp').click()">
+    <div class="big-icon">📸</div>
+    <div class="big-txt">Tap to take / upload photo</div>
+    <div class="small-txt">Photo of your label book page</div>
   </div>
+  <input type="file" id="fileInp" accept="image/*" multiple style="display:none" onchange="addFiles(this.files)"/>
 
-  <!-- TODAY TAB -->
-  <div id="tab-today" style="display:none">
-    <div class="stat-grid" id="today-stats"></div>
-    <div class="sec" id="today-sec-lbl">Product Summary</div>
-    <div class="tbl-wrap" id="today-product-tbl"></div>
-    <div class="btn-row">
-      <button class="btn btn-ghost" onclick="toggleRaw()">Show Raw Entries</button>
-      <button class="btn btn-ghost" onclick="exportExcel('day')">⬇ Export Today Excel</button>
-      <button class="btn btn-ghost" onclick="clearDay()">🗑 Clear Day</button>
-    </div>
-    <div id="raw-section" style="display:none;margin-top:16px">
-      <div class="sec">Raw Label Entries — <span id="raw-date-lbl"></span></div>
-      <div class="tbl-wrap" id="raw-tbl"></div>
-    </div>
-  </div>
+  <div id="prevRow"></div>
+  <div id="scanMsg"></div>
 
-  <!-- REPORT TAB -->
-  <div id="tab-report" style="display:none">
-    <div class="period-row">
-      <button class="period-btn active" id="p-day" onclick="setPeriod('day')">Today</button>
-      <button class="period-btn" id="p-week" onclick="setPeriod('week')">This Week</button>
-      <button class="period-btn" id="p-month" onclick="setPeriod('month')">This Month</button>
-    </div>
-    <div id="rep-range" style="font-size:11px;color:var(--muted);margin-bottom:16px"></div>
-    <div class="stat-grid" id="rep-stats"></div>
-    <div class="sec">Accumulated Product Totals</div>
-    <div class="tbl-wrap" id="rep-tbl"></div>
-    <div class="btn-row">
-      <button class="btn btn-green" id="rep-export-btn" onclick="exportCurrentReport()">⬇ Export to Excel</button>
-    </div>
-  </div>
+  <button id="scanBtn" onclick="doScan()" disabled>
+    <span id="scanIco">🤖</span>
+    <span id="scanTxt">SELECT A PHOTO FIRST</span>
+  </button>
 
-  <!-- HISTORY TAB -->
-  <div id="tab-history" style="display:none">
-    <div class="sec">All Recorded Days</div>
-    <div id="hist-list"></div>
-    <div style="margin-top:14px" id="clear-all-row"></div>
+  <div class="or">or add entry manually</div>
+
+  <div class="card">
+    <div class="card-title">✏️ Manual Entry</div>
+    <div class="mform">
+      <div class="finp full"><label>Product Name</label><input id="mProd" placeholder="e.g. Rump Steak" onkeydown="if(event.key==='Enter')addManual()"/></div>
+      <div class="finp"><label>Barcode / PLU</label><input id="mCode" placeholder="e.g. 1234" onkeydown="if(event.key==='Enter')addManual()"/></div>
+      <div class="finp"><label>Weight (kg)</label><input id="mKg" type="number" step="0.001" placeholder="1.450" onkeydown="if(event.key==='Enter')addManual()"/></div>
+      <div class="finp"><label>Price / kg (R)</label><input id="mPpkg" type="number" step="0.01" placeholder="189.99" onkeydown="if(event.key==='Enter')addManual()"/></div>
+      <div class="finp"><label>Total Price (R)</label><input id="mTotal" type="number" step="0.01" placeholder="Auto calculated" onkeydown="if(event.key==='Enter')addManual()"/></div>
+    </div>
+    <button class="btn-red" onclick="addManual()">+ ADD ENTRY</button>
   </div>
+</div>
+
+<!-- ③ TODAY -->
+<div class="page" id="pg-today">
+  <div class="stat-row">
+    <div class="stat-box"><div class="stat-val" id="s-entries" style="color:#1565c0">0</div><div class="stat-lbl">Entries</div></div>
+    <div class="stat-box"><div class="stat-val" id="s-prods" style="color:#2e7d32">0</div><div class="stat-lbl">Products</div></div>
+    <div class="stat-box"><div class="stat-val" id="s-kg" style="color:#e65100">0kg</div><div class="stat-lbl">Total Weight</div></div>
+    <div class="stat-box"><div class="stat-val" id="s-val" style="color:#b71c1c">R0</div><div class="stat-lbl">Total Value</div></div>
+  </div>
+  <div id="todayList"></div>
+  <div class="btn-row" style="display:flex;gap:8px;margin-top:4px">
+    <button class="btn-grey" style="flex:1" onclick="toggleRaw()">Show Raw Entries</button>
+    <button class="btn-grey" style="flex:1" onclick="clearDay()">🗑 Clear Day</button>
+  </div>
+  <div id="rawSection" style="display:none;margin-top:14px"></div>
+</div>
+
+<!-- ④ REPORTS -->
+<div class="page" id="pg-report">
+  <div class="period-row">
+    <button class="prbtn active" id="pr-day" onclick="setPeriod('day')">Today</button>
+    <button class="prbtn" id="pr-week" onclick="setPeriod('week')">This Week</button>
+    <button class="prbtn" id="pr-month" onclick="setPeriod('month')">This Month</button>
+    <button class="prbtn" id="pr-all" onclick="setPeriod('all')">All Time</button>
+  </div>
+  <div class="rep-range" id="repRange"></div>
+  <div class="rep-totals">
+    <div class="rep-tot-box"><div class="rep-tot-val" id="r-prods" style="color:#2e7d32">0</div><div class="rep-tot-lbl">Products</div></div>
+    <div class="rep-tot-box"><div class="rep-tot-val" id="r-kg" style="color:#e65100">0kg</div><div class="rep-tot-lbl">Weight</div></div>
+    <div class="rep-tot-box"><div class="rep-tot-val" id="r-val" style="color:#b71c1c">R0</div><div class="rep-tot-lbl">Value</div></div>
+  </div>
+  <div id="repList"></div>
+  <button class="btn-green" id="xlBtn" onclick="doExport()" style="margin-bottom:10px" disabled>📥 DOWNLOAD EXCEL REPORT</button>
+
+  <div style="margin-top:20px;border-top:1px solid #e0e0e0;padding-top:16px">
+    <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px">📅 All Recorded Days</div>
+    <div id="histList"></div>
+    <div id="clearAllWrap"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="botnav">
+  <button class="nav-btn active" id="nb-setup" onclick="gotoPage('setup')"><span class="ico">⚙️</span>Setup</button>
+  <button class="nav-btn" id="nb-scan" onclick="gotoPage('scan')"><span class="ico">📷</span>Scan</button>
+  <button class="nav-btn" id="nb-today" onclick="gotoPage('today')"><span class="ico">📋</span>Today</button>
+  <button class="nav-btn" id="nb-report" onclick="gotoPage('report')"><span class="ico">📊</span>Reports</button>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════
-const STORE_KEY = 'butchery_reworks_v3';
-let store = loadStore();
-let pendingImages = []; // {id, url, base64, mime}
-let rawVisible = false;
-let reportPeriod = 'day';
-let currentTab = 'capture';
-let idCtr = Date.now();
-const uid = () => String(++idCtr);
+// ═══════════════════════════ DATA ═══════════════════════════
+const DB_KEY='brt4';
+let db=(()=>{try{const d=JSON.parse(localStorage.getItem(DB_KEY)||'{}');return d.days?d:{days:{}};}catch{return{days:{}};}})();
+const persist=()=>localStorage.setItem(DB_KEY,JSON.stringify(db));
+const getKey=()=>localStorage.getItem('brt_apikey')||'';
+let imgs=[];
+let rawOpen=false;
+let period='day';
+let _id=Date.now();
+const uid=()=>String(++_id);
+const f2=n=>Number(n||0).toFixed(2);
+const f3=n=>Number(n||0).toFixed(3);
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const curDate=()=>document.getElementById('dateInp').value||todayStr();
+const todayStr=()=>new Date().toISOString().slice(0,10);
 
-function loadStore() {
-  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)||'{}'); return s.days ? s : {days:{}}; }
-  catch { return {days:{}}; }
+// ═══════════════════════════ SETUP ═══════════════════════════
+function saveKey(){
+  const v=document.getElementById('keyInp').value.trim();
+  if(!v){alert('Please paste your API key first.');return;}
+  if(!v.startsWith('sk-ant-')){alert('The key should start with sk-ant-\n\nPlease check you copied the full key.');return;}
+  localStorage.setItem('brt_apikey',v);
+  showKeySaved();
+  setTimeout(()=>gotoPage('scan'),1000);
 }
-function save() { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
-function saveKey() { localStorage.setItem('brt_api_key', document.getElementById('api-key-inp').value.trim()); }
-function loadKey() { return localStorage.getItem('brt_api_key')||''; }
-
-// ═══════════════════════════════════════════════
-//  DATE HELPERS
-// ═══════════════════════════════════════════════
-function today() { return new Date().toISOString().slice(0,10); }
-function getDate() { return document.getElementById('date-input').value || today(); }
-function fmt2(n){ return Number(n).toFixed(2); }
-function fmt3(n){ return Number(n).toFixed(3); }
-
-function weekRange(d){
-  const dt=new Date(d), day=dt.getDay();
-  const mon=new Date(dt); mon.setDate(dt.getDate()-((day+6)%7));
-  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
-  return [mon.toISOString().slice(0,10), sun.toISOString().slice(0,10)];
-}
-function monthRange(d){
-  const [y,m]=d.split('-');
-  const last=new Date(+y,+m,0).getDate();
-  return [`${y}-${m}-01`, `${y}-${m}-${String(last).padStart(2,'0')}`];
-}
-function rowsInRange(from,to){
-  return Object.entries(store.days)
-    .filter(([d])=>d>=from&&d<=to)
-    .flatMap(([,rows])=>rows);
-}
-function daysInRange(from,to){
-  return Object.keys(store.days).filter(d=>d>=from&&d<=to&&(store.days[d]||[]).length>0);
+function showKeySaved(){
+  const el=document.getElementById('keySaved');
+  if(getKey()){el.style.display='block';}else{el.style.display='none';}
 }
 
-function groupByProduct(rows){
-  const map={};
-  rows.forEach(r=>{
-    const key=(r.barcode||'')+'::'+(r.product||'');
-    if(!map[key]) map[key]={barcode:r.barcode||'',product:r.product||'',weight:0,totalValue:0,pricePerKg:r.pricePerKg,count:0};
-    map[key].weight+=r.weight;
-    map[key].totalValue+=r.totalValue;
-    map[key].count+=1;
-    map[key].pricePerKg=r.pricePerKg;
+// ═══════════════════════════ NAVIGATION ═══════════════════════════
+function gotoPage(p){
+  ['setup','scan','today','report'].forEach(x=>{
+    document.getElementById('pg-'+x).classList.toggle('active',x===p);
+    document.getElementById('nb-'+x).classList.toggle('active',x===p);
   });
-  return Object.values(map).sort((a,b)=>b.weight-a.weight);
+  if(p==='today')renderToday();
+  if(p==='report')renderReport();
+  if(p==='setup')showKeySaved();
 }
 
-// ═══════════════════════════════════════════════
-//  TABS
-// ═══════════════════════════════════════════════
-function switchTab(t){
-  ['capture','today','report','history'].forEach(id=>{
-    document.getElementById('tab-'+id).style.display = id===t?'block':'none';
-    document.getElementById('t-'+id).classList.toggle('active', id===t);
-  });
-  currentTab=t;
-  if(t==='today') renderToday();
-  if(t==='report') renderReport();
-  if(t==='history') renderHistory();
-}
-
-// ═══════════════════════════════════════════════
-//  IMAGE HANDLING
-// ═══════════════════════════════════════════════
+// ═══════════════════════════ SCAN ═══════════════════════════
 function addFiles(files){
   Array.from(files).filter(f=>f.type.startsWith('image/')).forEach(f=>{
-    const reader=new FileReader();
-    reader.onload=e=>{
-      const obj={id:uid(),url:e.target.result,base64:e.target.result.split(',')[1],mime:f.type};
-      pendingImages.push(obj);
-      renderPreview();
-      document.getElementById('analyse-btn').disabled=false;
+    const r=new FileReader();
+    r.onload=e=>{
+      imgs.push({id:uid(),url:e.target.result,base64:e.target.result.split(',')[1],mime:f.type});
+      renderPrev();
     };
-    reader.readAsDataURL(f);
+    r.readAsDataURL(f);
   });
 }
-function handleDrop(ev){
-  ev.preventDefault();
-  document.getElementById('drop-zone').classList.remove('drag');
-  addFiles(ev.dataTransfer.files);
-}
-function removeImage(id){
-  pendingImages=pendingImages.filter(i=>i.id!==id);
-  renderPreview();
-  document.getElementById('analyse-btn').disabled=pendingImages.length===0;
-}
-function renderPreview(){
-  document.getElementById('preview').innerHTML=pendingImages.map(i=>`
+function removeImg(id){imgs=imgs.filter(i=>i.id!==id);renderPrev();}
+function renderPrev(){
+  document.getElementById('prevRow').innerHTML=imgs.map(i=>`
     <div class="prev-wrap">
       <img src="${i.url}" class="prev-img"/>
-      <button class="prev-del" onclick="removeImage('${i.id}')">✕</button>
+      <button class="prev-x" onclick="removeImg('${i.id}')">✕</button>
     </div>`).join('');
+  const btn=document.getElementById('scanBtn');
+  const txt=document.getElementById('scanTxt');
+  btn.disabled=imgs.length===0;
+  txt.textContent=imgs.length>0?`SCAN ${imgs.length} PHOTO${imgs.length>1?'S':''}  →  ADD TO DAY`:'SELECT A PHOTO FIRST';
 }
 
-// ═══════════════════════════════════════════════
-//  AI ANALYSIS
-// ═══════════════════════════════════════════════
-async function analyseImages(){
-  const key=loadKey();
-  if(!key){ showErr('Please enter your Anthropic API key above first.'); return; }
-  if(!pendingImages.length) return;
+function showMsg(msg,type){const b=document.getElementById('scanMsg');b.textContent=msg;b.className='';b.className=type;b.style.display='block';}
+function hideMsg(){document.getElementById('scanMsg').style.display='none';}
 
-  showProg(`Scanning ${pendingImages.length} image(s) with AI…`);
-  hideErr(); hideOk();
-  document.getElementById('analyse-btn').disabled=true;
+async function doScan(){
+  const key=getKey();
+  if(!key){alert('Please set up your API key first.\n\nGo to the Setup tab.');gotoPage('setup');return;}
+  if(!imgs.length)return;
 
-  try {
-    const imgContent=pendingImages.map(i=>({
-      type:'image', source:{type:'base64',media_type:i.mime,data:i.base64}
-    }));
+  document.getElementById('scanBtn').disabled=true;
+  document.getElementById('scanIco').className='spin';
+  document.getElementById('scanTxt').textContent='Reading labels…';
+  showMsg('🤖 AI is reading your label photo… please wait…','info');
+
+  try{
+    const content=imgs.map(i=>({type:'image',source:{type:'base64',media_type:i.mime,data:i.base64}}));
+    content.push({type:'text',text:`These photos show pages from a butchery rework label book. Scale labels are pasted on the pages. Each label has a product description, a barcode or PLU code, weight in kg, price per kg, and a total price.
+
+Extract EVERY label from ALL images. Return ONLY valid JSON, no other text:
+{"items":[{"product":"Rump Steak","barcode":"1234","weightKg":1.450,"pricePerKg":189.99,"totalPrice":275.49}]}
+
+Rules:
+- product: full product name/description
+- barcode: PLU or scale code as text, use "" if not visible
+- weightKg: weight as a number in kg
+- pricePerKg: price per kg as a number
+- totalPrice: total price as a number. If not on label calculate as weightKg x pricePerKg
+- Extract every single label visible across all images`});
+
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:2000,
-        messages:[{role:'user',content:[
-          ...imgContent,
-          {type:'text',text:`These images show pages from a butchery rework log book. Each page has scale labels pasted in. Each label shows: product name/description, barcode or PLU/scale code, weight in kg, price per kg, sometimes a total price.
-
-Extract EVERY visible label from ALL images. Return ONLY valid JSON, no markdown, no explanation:
-{"items":[{"product":"Rump Steak","barcode":"1234","weight":1.450,"pricePerKg":189.99}]}
-
-Rules:
-- barcode: the PLU or scale code (string). Use "" if not visible.
-- weight and pricePerKg must be numbers (not strings)
-- Extract every single label you can see across all images`}
-        ]}]
-      })
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,messages:[{role:'user',content}]})
     });
-    if(!res.ok){ const e=await res.json(); throw new Error(e.error?.message||res.statusText); }
+
+    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Error '+res.status);}
     const data=await res.json();
-    const text=data.content?.map(c=>c.text||'').join('')||'';
+    const text=(data.content||[]).map(c=>c.text||'').join('');
     const clean=text.replace(/```json|```/g,'').trim();
     const parsed=JSON.parse(clean);
-    const d=getDate();
-    const newRows=(parsed.items||[]).map(i=>({
-      id:uid(), product:i.product||'Unknown', barcode:i.barcode||'',
-      weight:+i.weight||0, pricePerKg:+i.pricePerKg||0,
-      totalValue:+(+i.weight*(+i.pricePerKg)).toFixed(2)
+    const d=curDate();
+    const rows=(parsed.items||[]).map(i=>({
+      id:uid(),
+      product:String(i.product||'Unknown'),
+      barcode:String(i.barcode||''),
+      weightKg:+i.weightKg||0,
+      pricePerKg:+i.pricePerKg||0,
+      totalPrice:+i.totalPrice||+(+i.weightKg*(+i.pricePerKg)).toFixed(2)
     }));
-    if(!store.days[d]) store.days[d]=[];
-    store.days[d].push(...newRows);
-    save();
-    pendingImages=[];
-    renderPreview();
-    hideProg();
-    showOk(`✓ Extracted ${newRows.length} label(s) and added to ${d}`);
-    document.getElementById('analyse-btn').disabled=true;
-    setTimeout(()=>{ switchTab('today'); hideOk(); },1800);
-  } catch(e) {
-    hideProg();
-    showErr('Extraction failed: '+e.message+'. Check image quality and API key.');
-    document.getElementById('analyse-btn').disabled=false;
+
+    if(!db.days[d])db.days[d]=[];
+    db.days[d].push(...rows);
+    persist();
+    imgs=[];
+    renderPrev();
+    document.getElementById('scanIco').className='';
+    document.getElementById('scanIco').textContent='🤖';
+    showMsg(`✅ Done! Found ${rows.length} label${rows.length!==1?'s':''} — added to ${d}`,'ok');
+    setTimeout(()=>{hideMsg();gotoPage('today');},1800);
+
+  }catch(e){
+    document.getElementById('scanBtn').disabled=false;
+    document.getElementById('scanIco').className='';
+    document.getElementById('scanIco').textContent='🤖';
+    renderPrev();
+    showMsg('❌ '+e.message,'err');
   }
 }
 
-// ═══════════════════════════════════════════════
-//  MANUAL ADD
-// ═══════════════════════════════════════════════
 function addManual(){
-  const product=document.getElementById('m-product').value.trim();
-  const barcode=document.getElementById('m-barcode').value.trim();
-  const weight=parseFloat(document.getElementById('m-weight').value);
-  const price=parseFloat(document.getElementById('m-price').value);
-  if(!product||isNaN(weight)||isNaN(price)){showErr('Please fill in Product, Weight, and Price/kg.');return;}
-  const d=getDate();
-  if(!store.days[d]) store.days[d]=[];
-  store.days[d].push({id:uid(),product,barcode,weight,pricePerKg:price,totalValue:+(weight*price).toFixed(2)});
-  save();
-  ['m-product','m-barcode','m-weight','m-price'].forEach(id=>document.getElementById(id).value='');
-  showOk(`✓ Added "${product}" to ${d}`);
-  setTimeout(hideOk,2000);
+  const prod=document.getElementById('mProd').value.trim();
+  const code=document.getElementById('mCode').value.trim();
+  const kg=parseFloat(document.getElementById('mKg').value);
+  const ppkg=parseFloat(document.getElementById('mPpkg').value);
+  const tot=parseFloat(document.getElementById('mTotal').value);
+  if(!prod||isNaN(kg)){showMsg('Please fill in at least Product Name and Weight.','err');return;}
+  const totalPrice=isNaN(tot)?+(kg*(ppkg||0)).toFixed(2):tot;
+  const d=curDate();
+  if(!db.days[d])db.days[d]=[];
+  db.days[d].push({id:uid(),product:prod,barcode:code,weightKg:kg,pricePerKg:ppkg||0,totalPrice});
+  persist();
+  ['mProd','mCode','mKg','mPpkg','mTotal'].forEach(x=>document.getElementById(x).value='');
+  showMsg('✅ "'+prod+'" added to '+d,'ok');
+  setTimeout(hideMsg,2000);
 }
 
-// ═══════════════════════════════════════════════
-//  TODAY TAB
-// ═══════════════════════════════════════════════
+// ═══════════════════════════ TODAY ═══════════════════════════
+function groupRows(rows){
+  const m={};
+  rows.forEach(r=>{
+    const k=r.product+'::'+r.barcode;
+    if(!m[k])m[k]={product:r.product,barcode:r.barcode,weightKg:0,totalPrice:0,count:0,pricePerKg:r.pricePerKg};
+    m[k].weightKg+=r.weightKg;
+    m[k].totalPrice+=r.totalPrice;
+    m[k].count++;
+    m[k].pricePerKg=r.pricePerKg;
+  });
+  return Object.values(m).sort((a,b)=>b.weightKg-a.weightKg);
+}
+
 function renderToday(){
-  const d=getDate();
-  const rows=store.days[d]||[];
-  const grouped=groupByProduct(rows);
-  const totalW=rows.reduce((s,r)=>s+r.weight,0);
-  const totalV=rows.reduce((s,r)=>s+r.totalValue,0);
-  const prods=new Set(rows.map(r=>(r.barcode||r.product))).size;
+  const d=curDate();
+  const rows=db.days[d]||[];
+  const grouped=groupRows(rows);
+  const totKg=rows.reduce((s,r)=>s+r.weightKg,0);
+  const totVal=rows.reduce((s,r)=>s+r.totalPrice,0);
+  const prods=new Set(rows.map(r=>r.product)).size;
 
-  document.getElementById('today-stats').innerHTML=`
-    <div class="stat-card"><div class="stat-val" style="color:var(--blue)">${rows.length}</div><div class="stat-lbl">Entries</div></div>
-    <div class="stat-card"><div class="stat-val" style="color:var(--green)">${prods}</div><div class="stat-lbl">Products</div></div>
-    <div class="stat-card"><div class="stat-val" style="color:var(--amber)">${fmt3(totalW)}<span style="font-size:12px">kg</span></div><div class="stat-lbl">Total Weight</div></div>
-    <div class="stat-card"><div class="stat-val" style="color:var(--red)">R${fmt2(totalV)}</div><div class="stat-lbl">Total Value</div></div>`;
+  document.getElementById('s-entries').textContent=rows.length;
+  document.getElementById('s-prods').textContent=prods;
+  document.getElementById('s-kg').textContent=f3(totKg)+'kg';
+  document.getElementById('s-val').textContent='R'+f2(totVal);
 
-  document.getElementById('today-sec-lbl').textContent='Product Summary — '+d;
-  document.getElementById('today-product-tbl').innerHTML=buildProductTable(grouped, true);
-  document.getElementById('raw-date-lbl').textContent=d;
-  document.getElementById('raw-tbl').innerHTML=buildRawTable(rows);
+  if(!grouped.length){
+    document.getElementById('todayList').innerHTML=`<div class="empty"><div class="eico">📋</div><p>No entries for ${d} yet.<br/>Go to <strong>Scan</strong> to add labels.</p></div>`;
+  }else{
+    document.getElementById('todayList').innerHTML=grouped.map((r,i)=>`
+      <div class="prod-item ${i===0?'prod-top':''}">
+        <div class="prod-left">
+          <div class="prod-name">${i===0?'🏆 ':''}${esc(r.product)}</div>
+          <div class="prod-sub">${r.barcode?'PLU: '+esc(r.barcode)+' · ':''} ${r.count} entr${r.count===1?'y':'ies'}</div>
+        </div>
+        <div class="prod-right">
+          <div class="prod-kg">${f3(r.weightKg)} kg</div>
+          <div class="prod-val">R${f2(r.totalPrice)}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  // Raw entries
+  const rows2=db.days[d]||[];
+  document.getElementById('rawSection').innerHTML=rows2.length?`
+    <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Raw Entries</div>
+    ${rows2.map(r=>`
+    <div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;font-size:12px;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
+      <div>
+        <div style="font-weight:700;margin-bottom:2px">${esc(r.product)}</div>
+        <div style="color:#999">${r.barcode||'—'} · ${f3(r.weightKg)}kg · R${f2(r.totalPrice)}</div>
+      </div>
+      <button onclick="delEntry('${r.id}')" style="background:#ffebee;color:#b71c1c;border:none;border-radius:6px;padding:6px 10px;font-size:12px;cursor:pointer">✕</button>
+    </div>`).join('')}`:'';
 }
 
 function toggleRaw(){
-  rawVisible=!rawVisible;
-  const sec=document.getElementById('raw-section');
-  sec.style.display=rawVisible?'block':'none';
-  document.querySelector('.btn-row .btn-ghost').textContent=rawVisible?'Hide Raw Entries':'Show Raw Entries';
+  rawOpen=!rawOpen;
+  document.getElementById('rawSection').style.display=rawOpen?'block':'none';
+  document.querySelector('#pg-today .btn-row button:first-child').textContent=rawOpen?'Hide Raw Entries':'Show Raw Entries';
 }
-
-function deleteEntry(id){
-  const d=getDate();
-  store.days[d]=(store.days[d]||[]).filter(r=>r.id!==id);
-  save(); renderToday();
+function delEntry(id){
+  const d=curDate();
+  db.days[d]=(db.days[d]||[]).filter(r=>r.id!==id);
+  persist();renderToday();
 }
-
 function clearDay(){
-  if(!confirm('Clear ALL entries for '+getDate()+'?')) return;
-  store.days[getDate()]=[];
-  save(); renderToday();
+  if(!confirm('Clear all entries for '+curDate()+'?'))return;
+  db.days[curDate()]=[];persist();renderToday();
 }
 
-// ═══════════════════════════════════════════════
-//  REPORT TAB
-// ═══════════════════════════════════════════════
+// ═══════════════════════════ REPORTS ═══════════════════════════
+function weekRange(d){
+  const dt=new Date(d),day=dt.getDay();
+  const mon=new Date(dt);mon.setDate(dt.getDate()-((day+6)%7));
+  const sun=new Date(mon);sun.setDate(mon.getDate()+6);
+  return[mon.toISOString().slice(0,10),sun.toISOString().slice(0,10)];
+}
+function monthRange(d){
+  const[y,m]=d.split('-');
+  return[`${y}-${m}-01`,`${y}-${m}-${new Date(+y,+m,0).getDate().toString().padStart(2,'0')}`];
+}
+function rowsFor(p){
+  const d=curDate();
+  if(p==='day')return db.days[d]||[];
+  if(p==='week'){const[f,t]=weekRange(d);return Object.entries(db.days).filter(([k])=>k>=f&&k<=t).flatMap(([,v])=>v);}
+  if(p==='month'){const[f,t]=monthRange(d);return Object.entries(db.days).filter(([k])=>k>=f&&k<=t).flatMap(([,v])=>v);}
+  return Object.values(db.days).flat();
+}
+
 function setPeriod(p){
-  reportPeriod=p;
-  ['day','week','month'].forEach(x=>document.getElementById('p-'+x).classList.toggle('active',x===p));
+  period=p;
+  ['day','week','month','all'].forEach(x=>document.getElementById('pr-'+x).classList.toggle('active',x===p));
   renderReport();
 }
 
 function renderReport(){
-  const d=getDate();
-  let rows,from,to,label;
-  if(reportPeriod==='day'){
-    rows=store.days[d]||[]; from=d; to=d; label='Daily Report: '+d;
-  } else if(reportPeriod==='week'){
-    [from,to]=weekRange(d); rows=rowsInRange(from,to); label=`Weekly: ${from} → ${to}`;
-  } else {
-    [from,to]=monthRange(d); rows=rowsInRange(from,to); label=`Monthly: ${d.slice(0,7)}`;
+  const d=curDate();
+  const rows=rowsFor(period);
+  const grouped=groupRows(rows);
+  const totKg=rows.reduce((s,r)=>s+r.weightKg,0);
+  const totVal=rows.reduce((s,r)=>s+r.totalPrice,0);
+
+  let rangeText=d;
+  if(period==='week'){const[f,t]=weekRange(d);rangeText=f+' to '+t;}
+  else if(period==='month'){const[f,t]=monthRange(d);rangeText=d.slice(0,7);}
+  else if(period==='all')rangeText='All recorded data';
+  document.getElementById('repRange').textContent='📅 '+rangeText+' · '+rows.length+' entries';
+
+  document.getElementById('r-prods').textContent=grouped.length;
+  document.getElementById('r-kg').textContent=f3(totKg)+'kg';
+  document.getElementById('r-val').textContent='R'+f2(totVal);
+
+  if(!grouped.length){
+    document.getElementById('repList').innerHTML=`<div class="empty"><div class="eico">📊</div><p>No data for this period yet.</p></div>`;
+  }else{
+    document.getElementById('repList').innerHTML=grouped.map((r,i)=>`
+      <div class="prod-item ${i===0?'prod-top':''}">
+        <div class="prod-left">
+          <div class="prod-name">${i===0?'🏆 ':''}${esc(r.product)}</div>
+          <div class="prod-sub">${r.barcode?'PLU: '+esc(r.barcode)+' · ':''}${r.count} entr${r.count===1?'y':'ies'}</div>
+        </div>
+        <div class="prod-right">
+          <div class="prod-kg">${f3(r.weightKg)} kg</div>
+          <div class="prod-val">R${f2(r.totalPrice)}</div>
+        </div>
+      </div>`).join('');
   }
-  const grouped=groupByProduct(rows);
-  const totalW=rows.reduce((s,r)=>s+r.weight,0);
-  const totalV=rows.reduce((s,r)=>s+r.totalValue,0);
-  const dayCount=daysInRange(from,to).length;
 
-  document.getElementById('rep-range').textContent=label+' · '+rows.length+' entries';
-  document.getElementById('rep-stats').innerHTML=`
-    <div class="stat-card"><div class="stat-val" style="color:var(--green)">${grouped.length}</div><div class="stat-lbl">Products</div></div>
-    <div class="stat-card"><div class="stat-val" style="color:var(--amber)">${fmt3(totalW)}<span style="font-size:12px">kg</span></div><div class="stat-lbl">Total Weight</div></div>
-    <div class="stat-card"><div class="stat-val" style="color:var(--red)">R${fmt2(totalV)}</div><div class="stat-lbl">Total Value</div></div>
-    <div class="stat-card"><div class="stat-val" style="color:var(--blue)">${dayCount}</div><div class="stat-lbl">Days Captured</div></div>`;
-  document.getElementById('rep-tbl').innerHTML=buildProductTable(grouped,false);
-  const btn=document.getElementById('rep-export-btn');
-  btn.textContent='⬇ Export '+(reportPeriod==='day'?'Daily':reportPeriod==='week'?'Weekly':'Monthly')+' Report to Excel';
-}
+  document.getElementById('xlBtn').disabled=rows.length===0;
+  document.getElementById('xlBtn').textContent=`📥 DOWNLOAD ${period==='day'?'DAILY':period==='week'?'WEEKLY':period==='month'?'MONTHLY':'ALL TIME'} EXCEL`;
 
-function exportCurrentReport(){
-  const d=getDate();
-  exportExcel(reportPeriod, d);
-}
-
-// ═══════════════════════════════════════════════
-//  HISTORY TAB
-// ═══════════════════════════════════════════════
-function renderHistory(){
-  const d=getDate();
-  const days=Object.keys(store.days).filter(k=>(store.days[k]||[]).length>0).sort().reverse();
-  if(!days.length){
-    document.getElementById('hist-list').innerHTML='<div style="text-align:center;color:var(--muted);padding:40px 0;font-size:13px">No data yet. Start capturing label photos.</div>';
-    document.getElementById('clear-all-row').innerHTML='';
-    return;
-  }
-  document.getElementById('hist-list').innerHTML=days.map(day=>{
-    const rows=store.days[day]||[];
-    const tw=rows.reduce((s,r)=>s+r.weight,0);
-    const tv=rows.reduce((s,r)=>s+r.totalValue,0);
-    const prods=new Set(rows.map(r=>r.barcode||r.product)).size;
-    const isTd=day===d;
-    return `<div class="hist-item ${isTd?'today':''}" onclick="document.getElementById('date-input').value='${day}';switchTab('today')">
-      <div>
-        <div class="hist-date" style="color:${isTd?'var(--red)':'var(--text)'}">${day}${isTd?' (selected)':''}</div>
-        <div class="hist-meta">${rows.length} entries · ${prods} products · ${fmt3(tw)} kg</div>
-      </div>
-      <div style="font-size:15px;font-weight:900;color:var(--red);font-family:monospace">R${fmt2(tv)}</div>
+  // History
+  const days=Object.keys(db.days).filter(k=>(db.days[k]||[]).length>0).sort().reverse();
+  document.getElementById('histList').innerHTML=days.length?days.map(day=>{
+    const r=db.days[day]||[];
+    const tw=r.reduce((s,x)=>s+x.weightKg,0);
+    const tv=r.reduce((s,x)=>s+x.totalPrice,0);
+    const pr=new Set(r.map(x=>x.product)).size;
+    return`<div class="hist-item ${day===d?'prod-top':''}" onclick="document.getElementById('dateInp').value='${day}';setPeriod('day')">
+      <div><div class="hist-d">${day}${day===d?' ← today':''}</div><div class="hist-m">${r.length} entries · ${pr} products · ${f3(tw)}kg</div></div>
+      <div class="hist-v">R${f2(tv)}</div>
     </div>`;
-  }).join('');
-  document.getElementById('clear-all-row').innerHTML=`<button class="btn btn-ghost" onclick="clearAll()">🗑 Clear All Data</button>`;
+  }).join(''):'<div style="color:#bbb;text-align:center;padding:20px;font-size:13px">No days recorded yet</div>';
+
+  document.getElementById('clearAllWrap').innerHTML=days.length?`<button class="btn-grey" style="margin-top:8px" onclick="clearAll()">🗑 Clear All Data</button>`:'';
 }
 
-function clearAll(){
-  if(!confirm('Delete ALL reworks data? This cannot be undone!')) return;
-  store={days:{}}; save(); renderHistory();
-}
+function clearAll(){if(!confirm('Delete ALL data? Cannot be undone!'))return;db={days:{}};persist();renderReport();}
 
-// ═══════════════════════════════════════════════
-//  TABLE BUILDERS
-// ═══════════════════════════════════════════════
-function buildProductTable(grouped, showDelete){
-  if(!grouped.length) return '<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">No entries yet.</div>';
-  const totalW=grouped.reduce((s,r)=>s+r.weight,0);
-  const totalV=grouped.reduce((s,r)=>s+r.totalValue,0);
-  return `<table>
-    <thead><tr>
-      <th>Barcode</th><th>Product</th><th>Total Weight</th><th>Price/kg</th><th>Total Value</th><th>Entries</th>
-    </tr></thead>
-    <tbody>
-    ${grouped.map((r,i)=>`<tr>
-      <td><span class="pill">${r.barcode||'—'}</span></td>
-      <td style="font-weight:600">${esc(r.product)}</td>
-      <td class="c-amb">${fmt3(r.weight)} kg</td>
-      <td class="c-dim">R${fmt2(r.pricePerKg)}</td>
-      <td class="c-red">R${fmt2(r.totalValue)}</td>
-      <td style="text-align:center;color:var(--dim)">${r.count}</td>
-    </tr>`).join('')}
-    </tbody>
-    <tfoot><tr>
-      <td colspan="2" style="color:var(--muted);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:10px">TOTALS</td>
-      <td class="c-amb" style="font-size:15px">${fmt3(totalW)} kg</td>
-      <td></td>
-      <td class="c-red" style="font-size:15px">R${fmt2(totalV)}</td>
-      <td></td>
-    </tr></tfoot>
-  </table>`;
-}
+// ═══════════════════════════ EXCEL ═══════════════════════════
+function doExport(){
+  const d=curDate();
+  const rows=rowsFor(period);
+  const grouped=groupRows(rows);
+  let from=d,to=d,label='Daily Report: '+d;
+  if(period==='week'){[from,to]=weekRange(d);label='Weekly Report: '+from+' to '+to;}
+  else if(period==='month'){[from,to]=monthRange(d);label='Monthly Report: '+d.slice(0,7);}
+  else if(period==='all'){from='0000';to='9999';label='All Time Report';}
 
-function buildRawTable(rows){
-  if(!rows.length) return '';
-  return `<table>
-    <thead><tr><th>Barcode</th><th>Product</th><th>Weight</th><th>Price/kg</th><th>Total</th><th></th></tr></thead>
-    <tbody>
-    ${rows.map(r=>`<tr>
-      <td class="c-dim" style="font-size:11px">${r.barcode||'—'}</td>
-      <td>${esc(r.product)}</td>
-      <td class="c-dim">${fmt3(r.weight)}</td>
-      <td class="c-dim">R${fmt2(r.pricePerKg)}</td>
-      <td class="c-red">R${fmt2(r.totalValue)}</td>
-      <td><button class="del-btn" onclick="deleteEntry('${r.id}')">✕</button></td>
-    </tr>`).join('')}
-    </tbody>
-  </table>`;
-}
+  const totKg=grouped.reduce((s,r)=>s+r.weightKg,0);
+  const totVal=grouped.reduce((s,r)=>s+r.totalPrice,0);
 
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  const sheets=[];
 
-// ═══════════════════════════════════════════════
-//  EXCEL EXPORT (pure JS, no CDN)
-// ═══════════════════════════════════════════════
-function exportExcel(period, refDate){
-  refDate = refDate || getDate();
-  let rows, from, to, label;
-  if(period==='day'){
-    rows=store.days[refDate]||[]; from=refDate; to=refDate; label='Daily Report: '+refDate;
-  } else if(period==='week'){
-    [from,to]=weekRange(refDate); rows=rowsInRange(from,to); label='Weekly: '+from+' to '+to;
-  } else {
-    [from,to]=monthRange(refDate); rows=rowsInRange(from,to); label='Monthly: '+refDate.slice(0,7);
-  }
-
-  const grouped=groupByProduct(rows);
-  const totalW=grouped.reduce((s,r)=>s+r.weight,0);
-  const totalV=grouped.reduce((s,r)=>s+r.totalValue,0);
-
-  // Build workbook XML
-  const sheets = [];
-
-  // ── Summary sheet ──
-  const summaryRows=[
-    ['BUTCHERY REWORKS REPORT','','','','',''],
-    [label,'','','','',''],
-    ['Generated:',new Date().toLocaleString(),'','','',''],
-    ['','','','','',''],
+  // Summary
+  sheets.push({name:'Summary',data:[
+    ['BUTCHERY REWORKS REPORT'],
+    [label],
+    ['Generated:',new Date().toLocaleString()],
+    [],
     ['Barcode','Product','Total Weight (kg)','Price/kg (R)','Total Value (R)','Entries'],
-    ...grouped.map(r=>[r.barcode||'—',r.product,+r.weight.toFixed(3),+r.pricePerKg.toFixed(2),+r.totalValue.toFixed(2),r.count]),
-    ['','','','','',''],
-    ['TOTALS','',+totalW.toFixed(3),'',+totalV.toFixed(2),grouped.reduce((s,r)=>s+r.count,0)],
-  ];
-  sheets.push({name:'Summary', data:summaryRows});
+    ...grouped.map(r=>[r.barcode||'—',r.product,+r.weightKg.toFixed(3),+r.pricePerKg.toFixed(2),+r.totalPrice.toFixed(2),r.count]),
+    [],
+    ['TOTALS','',+totKg.toFixed(3),'',+totVal.toFixed(2),grouped.reduce((s,r)=>s+r.count,0)],
+  ]});
 
-  // ── Daily sheets ──
-  const dayKeys=Object.keys(store.days).filter(d=>d>=from&&d<=to&&(store.days[d]||[]).length).sort();
-  dayKeys.forEach(d=>{
-    const dayRows=store.days[d]||[];
-    const sheetData=[
+  // Daily sheets
+  const dayKeys=Object.keys(db.days).filter(k=>{
+    const r=db.days[k]||[];
+    if(!r.length)return false;
+    if(period==='all')return true;
+    return k>=from&&k<=to;
+  }).sort();
+
+  dayKeys.forEach(dk=>{
+    const dr=db.days[dk]||[];
+    sheets.push({name:dk.replace(/-/g,''),data:[
       ['Date','Barcode','Product','Weight (kg)','Price/kg (R)','Total Value (R)'],
-      ...dayRows.map(r=>[d,r.barcode||'—',r.product,+r.weight.toFixed(3),+r.pricePerKg.toFixed(2),+r.totalValue.toFixed(2)]),
-    ];
-    sheets.push({name:d.replace(/-/g,''), data:sheetData});
+      ...dr.map(r=>[dk,r.barcode||'—',r.product,+r.weightKg.toFixed(3),+r.pricePerKg.toFixed(2),+r.totalPrice.toFixed(2)]),
+    ]});
   });
 
-  const xlsxBlob=buildXlsx(sheets);
-  const url=URL.createObjectURL(xlsxBlob);
+  const blob=makeXlsx(sheets);
+  const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url; a.download=`reworks-${period}-${refDate}.xlsx`; a.click();
+  a.href=url;a.download=`reworks-${period}-${d}.xlsx`;a.click();
   setTimeout(()=>URL.revokeObjectURL(url),5000);
 }
 
-// ── Minimal XLSX builder (OOXML, no dependencies) ──
-function buildXlsx(sheets){
-  // Shared strings
-  const strings=[], strMap={};
-  function si(s){ s=String(s||''); if(strMap[s]===undefined){strMap[s]=strings.length;strings.push(s);} return strMap[s]; }
-
-  // Build sheet XMLs
-  const sheetXmls=sheets.map(({name,data})=>{
-    let xml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-      +'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-      +'<sheetData>';
-    data.forEach((row,ri)=>{
-      xml+=`<row r="${ri+1}">`;
-      row.forEach((cell,ci)=>{
-        const col=colName(ci); const addr=`${col}${ri+1}`;
-        if(typeof cell==='number'){
-          xml+=`<c r="${addr}" t="n"><v>${cell}</v></c>`;
-        } else {
-          xml+=`<c r="${addr}" t="s"><v>${si(cell)}</v></c>`;
-        }
-      });
-      xml+='</row>';
-    });
-    xml+='</sheetData></worksheet>';
-    return xml;
-  });
-
-  // Shared strings XML
-  const ssXml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-    +`<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${strings.length}" uniqueCount="${strings.length}">`
-    +strings.map(s=>`<si><t xml:space="preserve">${xmlEsc(s)}</t></si>`).join('')
-    +'</sst>';
-
-  // Workbook XML
-  const wbXml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-    +'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
-    +'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
-    +'<sheets>'
-    +sheets.map((s,i)=>`<sheet name="${xmlEsc(s.name)}" sheetId="${i+1}" r:id="rId${i+2}"/>`).join('')
-    +'</sheets></workbook>';
-
-  // Relationships
-  const wbRels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-    +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-    +`<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>`
-    +sheets.map((_,i)=>`<Relationship Id="rId${i+2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')
-    +'</Relationships>';
-
-  const pkgRels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-    +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-    +'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
-    +'</Relationships>';
-
-  const contentTypes='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-    +'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
-    +'<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
-    +'<Default Extension="xml" ContentType="application/xml"/>'
-    +'<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
-    +'<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>'
-    +sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')
-    +'</Types>';
-
-  // Zip it
-  const files={
-    '[Content_Types].xml': contentTypes,
-    '_rels/.rels': pkgRels,
-    'xl/workbook.xml': wbXml,
-    'xl/_rels/workbook.xml.rels': wbRels,
-    'xl/sharedStrings.xml': ssXml,
-  };
-  sheets.forEach((s,i)=>{ files[`xl/worksheets/sheet${i+1}.xml`]=sheetXmls[i]; });
-
-  return new Blob([buildZip(files)], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-}
-
-function colName(i){
-  let s=''; i++;
-  while(i>0){ i--; s=String.fromCharCode(65+(i%26))+s; i=Math.floor(i/26); }
-  return s;
-}
-function xmlEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// Pure-JS ZIP builder (store method, no compression needed for xlsx)
-function buildZip(files){
+// ═══════════════════════════ XLSX BUILDER ═══════════════════════════
+function makeXlsx(sheets){
   const enc=new TextEncoder();
-  const parts=[];
-  const centralDir=[];
-  let offset=0;
+  const ss=[],sm={};
+  const si=s=>{s=String(s||'');if(sm[s]===undefined){sm[s]=ss.length;ss.push(s);}return sm[s];};
+  const cn=i=>{let s='';i++;while(i>0){i--;s=String.fromCharCode(65+(i%26))+s;i=Math.floor(i/26);}return s;};
+  const xe=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-  for(const [name,content] of Object.entries(files)){
-    const nameBytes=enc.encode(name);
-    const dataBytes=enc.encode(content);
-    const crc=crc32(dataBytes);
-    const sz=dataBytes.length;
-
-    // Local file header
-    const lhSize=30+nameBytes.length;
-    const lh=new Uint8Array(lhSize);
-    const lv=new DataView(lh.buffer);
-    lv.setUint32(0,0x04034b50,true);  // signature
-    lv.setUint16(4,20,true);           // version needed
-    lv.setUint16(6,0,true);            // flags
-    lv.setUint16(8,0,true);            // compression (store)
-    lv.setUint16(10,0,true);           // mod time
-    lv.setUint16(12,0,true);           // mod date
-    lv.setUint32(14,crc,true);         // crc32
-    lv.setUint32(18,sz,true);          // compressed size
-    lv.setUint32(22,sz,true);          // uncompressed size
-    lv.setUint16(26,nameBytes.length,true);
-    lv.setUint16(28,0,true);
-    lh.set(nameBytes,30);
-
-    // Central directory entry
-    const cd=new Uint8Array(46+nameBytes.length);
-    const cv=new DataView(cd.buffer);
-    cv.setUint32(0,0x02014b50,true);
-    cv.setUint16(4,20,true);
-    cv.setUint16(6,20,true);
-    cv.setUint16(8,0,true);
-    cv.setUint16(10,0,true);
-    cv.setUint16(12,0,true);
-    cv.setUint16(14,0,true);
-    cv.setUint32(16,crc,true);
-    cv.setUint32(20,sz,true);
-    cv.setUint32(24,sz,true);
-    cv.setUint16(28,nameBytes.length,true);
-    cv.setUint16(30,0,true);
-    cv.setUint16(32,0,true);
-    cv.setUint16(34,0,true);
-    cv.setUint16(36,0,true);
-    cv.setUint32(38,0,true);
-    cv.setUint32(42,offset,true);
-    cd.set(nameBytes,46);
-
-    parts.push(lh, dataBytes);
-    centralDir.push(cd);
-    offset+=lhSize+sz;
-  }
-
-  const cdBytes=concat(centralDir);
-  const eocd=new Uint8Array(22);
-  const ev=new DataView(eocd.buffer);
-  ev.setUint32(0,0x06054b50,true);
-  ev.setUint16(4,0,true);
-  ev.setUint16(6,0,true);
-  ev.setUint16(8,centralDir.length,true);
-  ev.setUint16(10,centralDir.length,true);
-  ev.setUint32(12,cdBytes.length,true);
-  ev.setUint32(16,offset,true);
-  ev.setUint16(20,0,true);
-
-  return concat([...parts, cdBytes, eocd]);
-}
-
-function concat(arrays){
-  const total=arrays.reduce((s,a)=>s+a.length,0);
-  const out=new Uint8Array(total); let off=0;
-  arrays.forEach(a=>{out.set(a,off);off+=a.length;});
-  return out;
-}
-
-function crc32(data){
-  let crc=0xFFFFFFFF;
-  const table=crc32.table||(crc32.table=(()=>{
-    const t=new Uint32Array(256);
-    for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++) c=c&1?0xEDB88320^(c>>>1):c>>>1; t[i]=c;}
-    return t;
-  })());
-  for(let i=0;i<data.length;i++) crc=table[(crc^data[i])&0xFF]^(crc>>>8);
-  return (crc^0xFFFFFFFF)>>>0;
-}
-
-// ═══════════════════════════════════════════════
-//  UI HELPERS
-// ═══════════════════════════════════════════════
-function showErr(msg){ const b=document.getElementById('err-box'); b.textContent='⚠ '+msg; b.style.display='block'; }
-function hideErr(){ document.getElementById('err-box').style.display='none'; }
-function showProg(msg){ const b=document.getElementById('prog-box'); b.textContent='⟳ '+msg; b.style.display='block'; }
-function hideProg(){ document.getElementById('prog-box').style.display='none'; }
-function showOk(msg){ const b=document.getElementById('ok-box'); b.textContent=msg; b.style.display='block'; }
-function hideOk(){ document.getElementById('ok-box').style.display='none'; }
-
-// ═══════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('date-input').value=today();
-  const savedKey=loadKey();
-  if(savedKey) document.getElementById('api-key-inp').value=savedKey;
-
-  // Keep date in sync and refresh active tab
-  document.getElementById('date-input').addEventListener('change',()=>{
-    if(currentTab==='today') renderToday();
-    if(currentTab==='report') renderReport();
-    if(currentTab==='history') renderHistory();
+  const sxmls=sheets.map(({data})=>{
+    let x='<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>';
+    data.forEach((row,ri)=>{
+      x+=`<row r="${ri+1}">`;
+      row.forEach((c,ci)=>{const a=`${cn(ci)}${ri+1}`;x+=typeof c==='number'?`<c r="${a}"><v>${c}</v></c>`:`<c r="${a}" t="s"><v>${si(c)}</v></c>`;});
+      x+='</row>';
+    });
+    return x+'</sheetData></worksheet>';
   });
 
-  // Fix drop zone event binding properly
-  const dz=document.getElementById('drop-zone');
+  const ssx=`<?xml version="1.0" encoding="UTF-8"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${ss.length}" uniqueCount="${ss.length}">${ss.map(s=>`<si><t xml:space="preserve">${xe(s)}</t></si>`).join('')}</sst>`;
+  const wbx=`<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((s,i)=>`<sheet name="${xe(s.name)}" sheetId="${i+1}" r:id="rId${i+2}"/>`).join('')}</sheets></workbook>`;
+  const wbr=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>${sheets.map((_,i)=>`<Relationship Id="rId${i+2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}</Relationships>`;
+  const pkr=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+  const ct=`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>${sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`;
+
+  const files={'[Content_Types].xml':ct,'_rels/.rels':pkr,'xl/workbook.xml':wbx,'xl/_rels/workbook.xml.rels':wbr,'xl/sharedStrings.xml':ssx};
+  sheets.forEach((s,i)=>files[`xl/worksheets/sheet${i+1}.xml`]=sxmls[i]);
+
+  const crc=data=>{let c=0xFFFFFFFF;const t=crc.t||(crc.t=(()=>{const a=new Uint32Array(256);for(let i=0;i<256;i++){let x=i;for(let j=0;j<8;j++)x=x&1?0xEDB88320^(x>>>1):x>>>1;a[i]=x;}return a;})());for(let i=0;i<data.length;i++)c=t[(c^data[i])&0xFF]^(c>>>8);return(c^0xFFFFFFFF)>>>0;};
+  const cat=a=>{const t=a.reduce((s,x)=>s+x.length,0),o=new Uint8Array(t);let p=0;a.forEach(x=>{o.set(x,p);p+=x.length;});return o;};
+
+  const parts=[],cds=[];let off=0;
+  for(const[name,content]of Object.entries(files)){
+    const nb=enc.encode(name),db2=enc.encode(content),cr=crc(db2),sz=db2.length;
+    const lh=new Uint8Array(30+nb.length),lv=new DataView(lh.buffer);
+    lv.setUint32(0,0x04034b50,true);lv.setUint16(4,20,true);lv.setUint16(6,0,true);lv.setUint16(8,0,true);lv.setUint16(10,0,true);lv.setUint16(12,0,true);lv.setUint32(14,cr,true);lv.setUint32(18,sz,true);lv.setUint32(22,sz,true);lv.setUint16(26,nb.length,true);lv.setUint16(28,0,true);lh.set(nb,30);
+    const ce=new Uint8Array(46+nb.length),cv=new DataView(ce.buffer);
+    cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);cv.setUint16(8,0,true);cv.setUint16(10,0,true);cv.setUint16(12,0,true);cv.setUint16(14,0,true);cv.setUint32(16,cr,true);cv.setUint32(20,sz,true);cv.setUint32(24,sz,true);cv.setUint16(28,nb.length,true);cv.setUint16(30,0,true);cv.setUint16(32,0,true);cv.setUint16(34,0,true);cv.setUint16(36,0,true);cv.setUint32(38,0,true);cv.setUint32(42,off,true);ce.set(nb,46);
+    parts.push(lh,db2);cds.push(ce);off+=30+nb.length+sz;
+  }
+  const cdb=cat(cds),eo=new Uint8Array(22),ev=new DataView(eo.buffer);
+  ev.setUint32(0,0x06054b50,true);ev.setUint16(4,0,true);ev.setUint16(6,0,true);ev.setUint16(8,cds.length,true);ev.setUint16(10,cds.length,true);ev.setUint32(12,cdb.length,true);ev.setUint32(16,off,true);ev.setUint16(20,0,true);
+  return new Blob([cat([...parts,cdb,eo])],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+
+// ═══════════════════════════ INIT ═══════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('dateInp').value=todayStr();
+  showKeySaved();
+  document.getElementById('dateInp').addEventListener('change',()=>{
+    if(document.getElementById('pg-today').classList.contains('active'))renderToday();
+    if(document.getElementById('pg-report').classList.contains('active'))renderReport();
+  });
+  const dz=document.getElementById('dropZone');
   dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
   dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
   dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');addFiles(e.dataTransfer.files);});
+  // If key already saved go straight to scan
+  if(getKey())gotoPage('scan');
 });
 </script>
 </body>
