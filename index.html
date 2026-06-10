@@ -352,8 +352,7 @@ Rules:
     const clean=text.replace(/```json|```/g,'').trim();
     const parsed=JSON.parse(clean);
     const d=curDate();
-    const rows=(parsed.items||[]).map(i=>({
-      id:uid(),
+    const rawRows=(parsed.items||[]).map(i=>({
       product:String(i.product||'Unknown'),
       barcode:String(i.barcode||''),
       weightKg:+i.weightKg||0,
@@ -361,14 +360,36 @@ Rules:
       totalPrice:+i.totalPrice||+(+i.weightKg*(+i.pricePerKg)).toFixed(2)
     }));
 
+    // Merge duplicates from this scan
+    const mergeMap={};
+    rawRows.forEach(r=>{
+      const k=r.product.toLowerCase().trim()+'::'+r.barcode;
+      if(!mergeMap[k]){mergeMap[k]={id:uid(),product:r.product,barcode:r.barcode,weightKg:0,pricePerKg:r.pricePerKg,totalPrice:0};}
+      mergeMap[k].weightKg=+(mergeMap[k].weightKg+r.weightKg).toFixed(3);
+      mergeMap[k].totalPrice=+(mergeMap[k].totalPrice+r.totalPrice).toFixed(2);
+    });
+    const rows=Object.values(mergeMap);
+    const labelCount=rawRows.length;
+    const prodCount=rows.length;
+
     if(!db.days[d])db.days[d]=[];
-    db.days[d].push(...rows);
+    // Merge with existing entries for same product today
+    rows.forEach(newRow=>{
+      const k=newRow.product.toLowerCase().trim()+'::'+newRow.barcode;
+      const existing=db.days[d].find(r=>r.product.toLowerCase().trim()+'::'+r.barcode===k);
+      if(existing){
+        existing.weightKg=+(existing.weightKg+newRow.weightKg).toFixed(3);
+        existing.totalPrice=+(existing.totalPrice+newRow.totalPrice).toFixed(2);
+      }else{
+        db.days[d].push(newRow);
+      }
+    });
     persist();
     imgs=[];
     renderPrev();
     document.getElementById('scanIco').className='';
     document.getElementById('scanIco').textContent='🤖';
-    showMsg(`✅ Done! Found ${rows.length} label${rows.length!==1?'s':''} — added to ${d}`,'ok');
+    const mergeNote=labelCount>prodCount?` (${labelCount} labels merged into ${prodCount} products)`:'';showMsg(`Done! Found ${labelCount} label${labelCount!==1?'s':''}${mergeNote} added to ${d}`,'ok');
     setTimeout(()=>{hideMsg();gotoPage('today');},1800);
 
   }catch(e){
