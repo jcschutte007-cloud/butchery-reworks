@@ -360,10 +360,10 @@ Rules:
       totalPrice:+i.totalPrice||+(+i.weightKg*(+i.pricePerKg)).toFixed(2)
     }));
 
-    // Merge duplicates from this scan using normalised keys
+    // Merge duplicates from this scan by product name only
     const mergeMap={};
     rawRows.forEach(r=>{
-      const k=normKey(r.product)+'::'+normKey(r.barcode);
+      const k=normKey(r.product);
       if(!mergeMap[k]){mergeMap[k]={id:uid(),product:r.product,barcode:r.barcode,weightKg:0,pricePerKg:r.pricePerKg,totalPrice:0};}
       mergeMap[k].weightKg=+(mergeMap[k].weightKg+r.weightKg).toFixed(3);
       mergeMap[k].totalPrice=+(mergeMap[k].totalPrice+r.totalPrice).toFixed(2);
@@ -373,10 +373,10 @@ Rules:
     const prodCount=rows.length;
 
     if(!db.days[d])db.days[d]=[];
-    // Merge with existing entries for same product today using normalised keys
+    // Merge with existing entries for same product today by name only
     rows.forEach(newRow=>{
-      const k=normKey(newRow.product)+'::'+normKey(newRow.barcode);
-      const existing=db.days[d].find(r=>normKey(r.product)+'::'+normKey(r.barcode)===k);
+      const k=normKey(newRow.product);
+      const existing=db.days[d].find(r=>normKey(r.product)===k);
       if(existing){
         existing.weightKg=+(existing.weightKg+newRow.weightKg).toFixed(3);
         existing.totalPrice=+(existing.totalPrice+newRow.totalPrice).toFixed(2);
@@ -423,8 +423,8 @@ function normKey(s){return String(s||'').toLowerCase().replace(/\s+/g,' ').trim(
 function groupRows(rows){
   const m={};
   rows.forEach(r=>{
-    // Use normalised product name so "BULK STEWING BEEF" and "Bulk Stewing Beef" merge
-    const k=normKey(r.product)+'::'+normKey(r.barcode);
+    // Group by product name ONLY — barcodes differ per packet from the scale
+    const k=normKey(r.product);
     if(!m[k])m[k]={product:r.product,barcode:r.barcode,weightKg:0,totalPrice:0,count:0,pricePerKg:r.pricePerKg};
     m[k].weightKg=+(m[k].weightKg+r.weightKg).toFixed(3);
     m[k].totalPrice=+(m[k].totalPrice+r.totalPrice).toFixed(2);
